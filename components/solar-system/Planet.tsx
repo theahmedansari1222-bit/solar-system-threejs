@@ -1,8 +1,8 @@
 "use client"
 
-import { useRef, MutableRefObject } from "react"
+import { useRef, MutableRefObject, useState, useEffect } from "react"
 import { useFrame, useLoader } from "@react-three/fiber"
-import { TextureLoader, Mesh, Group, Vector3 } from "three"
+import { Texture, TextureLoader, Mesh, Group, Vector3, Color } from "three"
 import { PlanetData } from "@/data/planets"
 import { getTexturePath } from "@/lib/asset-path"
 
@@ -18,13 +18,20 @@ type PlanetProps = {
 }
 
 function SaturnRing() {
+  const [ringError, setRingError] = useState(false)
   const ringTexture = useLoader(TextureLoader, getTexturePath("2k_saturn_ring_alpha.png"))
+
+  useEffect(() => {
+    if (ringTexture) {
+      ringTexture.colorSpace = "srgb"
+    }
+  }, [ringTexture])
 
   return (
     <mesh rotation={[Math.PI / 2.5, 0, 0]}>
       <ringGeometry args={[1.2, 2.0, 64]} />
       <meshStandardMaterial
-        map={ringTexture}
+        map={ringError ? null : ringTexture}
         transparent
         opacity={0.8}
         side={2}
@@ -46,7 +53,16 @@ export function Planet({
   const groupRef = useRef<Group>(null)
   const meshRef = useRef<Mesh>(null)
   const angleRef = useRef(Math.random() * Math.PI * 2)
+  const [textureError, setTextureError] = useState(false)
+  const fallbackColor = new Color(data.color)
+
   const texture = useLoader(TextureLoader, getTexturePath(data.texture))
+
+  useEffect(() => {
+    if (texture) {
+      texture.colorSpace = "srgb"
+    }
+  }, [texture])
 
   useFrame((_, delta) => {
     if (paused) return
@@ -76,7 +92,10 @@ export function Planet({
         }}
       >
         <sphereGeometry args={[data.radius, 32, 32]} />
-        <meshStandardMaterial map={texture} />
+        <meshStandardMaterial
+          map={textureError ? null : texture}
+          color={textureError ? fallbackColor : "#ffffff"}
+        />
       </mesh>
       {data.name === "Saturn" && <SaturnRing />}
       {isCompareSelected && (

@@ -1,15 +1,16 @@
 "use client"
 
-import { Suspense, useRef } from "react"
+import { Suspense, useRef, useEffect } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
-import { Vector3 } from "three"
+import { Vector3, AmbientLight as ThreeAmbientLight, PointLight as ThreePointLight } from "three"
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib"
 import { Sun } from "./Sun"
 import { Planet } from "./Planet"
 import { Moon } from "./Moon"
 import { OrbitRing } from "./OrbitRing"
 import { PLANETS } from "@/data/planets"
+import { ErrorBoundary } from "./ErrorBoundary"
 
 const DEFAULT_CAMERA_POS = new Vector3(0, 20, 25)
 const LERP_SPEED = 0.03
@@ -69,13 +70,16 @@ function SceneContent({
   comparePlanets,
   focusedPlanet,
 }: SolarSceneProps) {
-  const earthPositionRef = useRef(new Vector3(7, 0, 0))
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
-  const isFocused = focusedPlanet !== null
+  const earthPositionRef = useRef(new Vector3())
+  const { size, viewport } = useThree()
+  const isFocused = focusedPlanet === "Earth"
 
+  // Add ambient light so planets are visible even without direct sunlight
   return (
     <>
-      <ambientLight intensity={isFocused ? 0.05 : 0.15} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 0, 0]} intensity={2} distance={100} decay={0.1} />
       <Stars radius={300} depth={60} count={5000} factor={4} fade speed={0.5} />
       <Sun />
       {PLANETS.map((planet) => (
@@ -122,15 +126,115 @@ function SceneContent({
   )
 }
 
+function CanvasFallback() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0a0a0a",
+        color: "#fff",
+        fontFamily: "system-ui, sans-serif",
+        fontSize: "14px",
+      }}
+      role="status"
+      aria-label="Loading solar system"
+    >
+      <div style={{ textAlign: "center" }}>
+        <div
+          style={{
+            width: "48px",
+            height: "48px",
+            border: "4px solid #333",
+            borderTopColor: "#fff",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            margin: "0 auto 12px",
+          }}
+        />
+        <style jsx>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+        <p>Loading Solar System…</p>
+        <p style={{ fontSize: "12px", color: "#888", marginTop: "8px" }}>
+          Initializing WebGL…
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function CanvasErrorFallback() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#0a0a0a",
+        color: "#fff",
+        fontFamily: "system-ui, sans-serif",
+        padding: "24px",
+        textAlign: "center",
+      }}
+      role="alert"
+    >
+      <div>
+        <h2 style={{ margin: "0 0 12px", fontSize: "18px" }}>
+          Unable to load 3D scene
+        </h2>
+        <p style={{ margin: "0 0 16px", color: "#aaa", fontSize: "14px" }}>
+          WebGL may not be supported or the textures failed to load.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 20px",
+            background: "#4488ff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            fontSize: "14px",
+            cursor: "pointer",
+          }}
+        >
+          Reload Page
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function SolarScene(props: SolarSceneProps) {
   return (
-    <Canvas
-      camera={{ position: [0, 20, 25], fov: 60 }}
-      onPointerMissed={() => props.onSelectPlanet(null)}
-    >
-      <Suspense fallback={null}>
-        <SceneContent {...props} />
-      </Suspense>
-    </Canvas>
+    <ErrorBoundary fallback={<CanvasErrorFallback />}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
+        }}
+        aria-label="Interactive 3D Solar System"
+      >
+        <Canvas
+          camera={{ position: [0, 20, 25], fov: 60 }}
+          onPointerMissed={() => props.onSelectPlanet(null)}
+          style={{ width: "100%", height: "100%", display: "block" }}
+        >
+          <Suspense fallback={<CanvasFallback />}>
+            <SceneContent {...props} />
+          </Suspense>
+        </Canvas>
+      </div>
+    </ErrorBoundary>
   )
 }
