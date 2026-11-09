@@ -4,6 +4,7 @@ import { useRef, MutableRefObject } from "react"
 import { useFrame, useLoader } from "@react-three/fiber"
 import { TextureLoader, Mesh, Group, Vector3 } from "three"
 import { PlanetData } from "@/data/planets"
+import { getTexturePath } from "@/lib/asset-path"
 
 type PlanetProps = {
   data: PlanetData
@@ -17,7 +18,7 @@ type PlanetProps = {
 }
 
 function SaturnRing() {
-  const ringTexture = useLoader(TextureLoader, "/textures/2k_saturn_ring_alpha.png")
+  const ringTexture = useLoader(TextureLoader, getTexturePath("2k_saturn_ring_alpha.png"))
 
   return (
     <mesh rotation={[Math.PI / 2.5, 0, 0]}>
@@ -45,7 +46,7 @@ export function Planet({
   const groupRef = useRef<Group>(null)
   const meshRef = useRef<Mesh>(null)
   const angleRef = useRef(Math.random() * Math.PI * 2)
-  const texture = useLoader(TextureLoader, data.texture)
+  const texture = useLoader(TextureLoader, getTexturePath(data.texture))
 
   useFrame((_, delta) => {
     if (paused) return

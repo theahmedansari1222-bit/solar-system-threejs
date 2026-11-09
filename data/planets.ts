@@ -20,13 +20,13 @@ export type PlanetData = {
 }
 
 export const SUN_DATA = {
-  texture: "/textures/2k_sun.jpg",
+  texture: "2k_sun.jpg",
   radius: 2.5,
 }
 
 export const MOON_DATA: PlanetData = {
   name: "Moon",
-  texture: "/textures/2k_moon.jpg",
+  texture: "2k_moon.jpg",
   radius: 0.15,
   orbitRadius: 1.2,
   orbitSpeed: 2.5,
@@ -47,7 +47,7 @@ export const MOON_DATA: PlanetData = {
 export const PLANETS: PlanetData[] = [
   {
     name: "Mercury",
-    texture: "/textures/2k_mercury.jpg",
+    texture: "2k_mercury.jpg",
     radius: 0.25,
     orbitRadius: 4,
     orbitSpeed: 4.15,
@@ -66,7 +66,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Venus",
-    texture: "/textures/2k_venus_surface.jpg",
+    texture: "2k_venus_surface.jpg",
     radius: 0.45,
     orbitRadius: 5.5,
     orbitSpeed: 1.62,
@@ -85,7 +85,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Earth",
-    texture: "/textures/2k_earth_daymap.jpg",
+    texture: "2k_earth_daymap.jpg",
     radius: 0.5,
     orbitRadius: 7,
     orbitSpeed: 1.0,
@@ -104,7 +104,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Mars",
-    texture: "/textures/2k_mars.jpg",
+    texture: "2k_mars.jpg",
     radius: 0.35,
     orbitRadius: 8.5,
     orbitSpeed: 0.53,
@@ -123,7 +123,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Jupiter",
-    texture: "/textures/2k_jupiter.jpg",
+    texture: "2k_jupiter.jpg",
     radius: 1.2,
     orbitRadius: 11,
     orbitSpeed: 0.084,
@@ -142,7 +142,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Saturn",
-    texture: "/textures/2k_saturn.jpg",
+    texture: "2k_saturn.jpg",
     radius: 1.0,
     orbitRadius: 14,
     orbitSpeed: 0.034,
@@ -161,7 +161,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Uranus",
-    texture: "/textures/2k_uranus.jpg",
+    texture: "2k_uranus.jpg",
     radius: 0.7,
     orbitRadius: 17,
     orbitSpeed: 0.012,
@@ -180,7 +180,7 @@ export const PLANETS: PlanetData[] = [
   },
   {
     name: "Neptune",
-    texture: "/textures/2k_neptune.jpg",
+    texture: "2k_neptune.jpg",
     radius: 0.65,
     orbitRadius: 20,
     orbitSpeed: 0.006,

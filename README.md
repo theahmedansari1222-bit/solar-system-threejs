@@ -7,6 +7,10 @@ An interactive 3D solar system visualization built with **Three.js**, **React Th
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Live Demo
+
+🌐 **[https://theahmedansari1222-bit.github.io/solar-system-threejs/](https://theahmedansari1222-bit.github.io/solar-system-threejs/)**
+
 ## Features
 
 - **Realistic 3D rendering** — Textured spheres for all planets with proper relative sizing
@@ -40,7 +44,7 @@ An interactive 3D solar system visualization built with **Three.js**, **React Th
 ### Installation
 
 ```bash
-git clone https://github.com/themrboyd/solar-system-threejs.git
+git clone https://github.com/theahmedansari1222-bit/solar-system-threejs.git
 cd solar-system-threejs
 npm install
 ```
@@ -53,11 +57,24 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Build
+### Build (Static Export)
+
+This project is configured for **static export** to deploy to GitHub Pages.
 
 ```bash
+# Build for local testing (no basePath)
 npm run build
-npm start
+
+# Build for GitHub Pages (with basePath)
+GITHUB_PAGES=true NEXT_PUBLIC_BASE_PATH=/solar-system-threejs npm run build
+```
+
+The static output will be in the `out/` directory.
+
+To test the exported build locally:
+
+```bash
+npx serve out
 ```
 
 ### Type Check
@@ -66,16 +83,47 @@ npm start
 npm run typecheck
 ```
 
+## GitHub Pages Deployment
+
+This project automatically deploys to GitHub Pages via GitHub Actions on every push to `main`.
+
+### How It Works
+
+1. **Push to `main`** triggers the deployment workflow (`.github/workflows/deploy.yml`)
+2. **GitHub Actions** runs:
+   - `npm ci` — install dependencies
+   - `npm run typecheck` — verify TypeScript
+   - `npm run build` — build static export with `GITHUB_PAGES=true` and `NEXT_PUBLIC_BASE_PATH=/solar-system-threejs`
+   - Upload `out/` directory as Pages artifact
+   - Deploy to GitHub Pages
+3. **Live site** updates at: `https://theahmedansari1222-bit.github.io/solar-system-threejs/`
+
+### Enable GitHub Pages (One-Time Setup)
+
+1. Go to your repository **Settings** → **Pages**
+2. Under **Source**, select **GitHub Actions**
+3. Save
+
+The first push to `main` after enabling will trigger the deployment.
+
+### Manual Deployment
+
+You can also trigger a deployment manually:
+1. Go to **Actions** tab → **Deploy to GitHub Pages**
+2. Click **Run workflow** → **Run workflow**
+
+### Pull Requests
+
+Pull requests targeting `main` run the build and typecheck but **do not deploy**. This verifies the PR won't break the site.
+
 ## Project Structure
 
 ```
 solar-system-threejs/
 ├── app/
 │   ├── layout.tsx                  # Root layout (metadata, global styles)
-│   ├── page.tsx                    # Redirects to /solar-system
-│   ├── globals.css                 # Global styles (Tailwind)
-│   └── solar-system/
-│       └── page.tsx                # Main page — state management & UI composition
+│   ├── page.tsx                    # Main page — state management & UI composition
+│   └── globals.css                 # Global styles (Tailwind)
 ├── components/
 │   ├── solar-system/               # 3D scene components (React Three Fiber)
 │   │   ├── SolarScene.tsx          # Canvas, camera controller, scene orchestration
@@ -83,15 +131,23 @@ solar-system-threejs/
 │   │   ├── Planet.tsx              # Planet mesh with orbit, rotation & selection
 │   │   ├── Moon.tsx                # Moon orbiting Earth
 │   │   └── OrbitRing.tsx           # Circular orbit path visualization
-│   └── ui/                        # 2D overlay components (HTML/Tailwind)
+│   └── ui/                         # 2D overlay components (HTML/Tailwind)
 │       ├── InfoPanel.tsx           # Planet information card
 │       ├── ComparePanel.tsx        # Side-by-side planet comparison
 │       ├── ControlBar.tsx          # Playback controls & mode toggles
 │       └── LoadingScreen.tsx       # Loading spinner
 ├── data/
 │   └── planets.ts                  # Planet data & TypeScript types
-└── public/
-    └── textures/                   # 2K planet texture maps
+├── lib/
+│   └── asset-path.ts               # Asset path helper for GitHub Pages basePath
+├── public/
+│   └── textures/                   # 2K planet texture maps
+├── .github/workflows/
+│   └── deploy.yml                  # GitHub Actions deployment workflow
+├── next.config.ts                  # Next.js config (static export, basePath)
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
 ## Architecture
@@ -102,7 +158,7 @@ The app follows a clear separation between **3D scene** and **2D UI**:
 
 ```
 ┌─────────────────────────────────────────────┐
-│  SolarSystemPage (app/solar-system/page.tsx) │
+│  SolarSystemPage (app/page.tsx)             │
 │  ┌─────────────────┐  ┌──────────────────┐  │
 │  │   SolarScene     │  │   UI Overlays    │  │
 │  │  ┌────────────┐  │  │  ┌────────────┐  │  │
@@ -140,7 +196,7 @@ All planet data is centralized in [`data/planets.ts`](data/planets.ts). Each pla
 ```typescript
 type PlanetData = {
   name: string          // Display name
-  texture: string       // Path to texture map
+  texture: string       // Texture filename (resolved via asset-path helper)
   radius: number        // Visual radius (not to scale)
   orbitRadius: number   // Distance from Sun
   orbitSpeed: number    // Orbital velocity multiplier
@@ -153,6 +209,8 @@ type PlanetData = {
 ## Textures
 
 Planet textures are 2K resolution maps from [Solar System Scope](https://www.solarsystemscope.com/textures/). They are included in `public/textures/` for convenience.
+
+Texture paths are resolved at runtime using the [`lib/asset-path.ts`](lib/asset-path.ts) helper, which automatically handles the GitHub Pages `basePath` prefix.
 
 ## Contributing
 

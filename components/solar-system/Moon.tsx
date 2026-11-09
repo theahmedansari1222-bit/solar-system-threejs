@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { useFrame, useLoader } from "@react-three/fiber"
 import { TextureLoader, Mesh, Group } from "three"
 import { MOON_DATA } from "@/data/planets"
+import { getTexturePath } from "@/lib/asset-path"
 
 type MoonProps = {
   speedMultiplier: number
@@ -16,7 +17,7 @@ export function Moon({ speedMultiplier, paused, isSelected, onSelect }: MoonProp
   const groupRef = useRef<Group>(null)
   const meshRef = useRef<Mesh>(null)
   const angleRef = useRef(Math.random() * Math.PI * 2)
-  const texture = useLoader(TextureLoader, MOON_DATA.texture)
+  const texture = useLoader(TextureLoader, getTexturePath(MOON_DATA.texture))
 
   useFrame((_, delta) => {
     if (paused) return

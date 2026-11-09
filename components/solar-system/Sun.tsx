@@ -4,10 +4,11 @@ import { useRef } from "react"
 import { useFrame, useLoader } from "@react-three/fiber"
 import { TextureLoader, Mesh } from "three"
 import { SUN_DATA } from "@/data/planets"
+import { getTexturePath } from "@/lib/asset-path"
 
 export function Sun() {
   const meshRef = useRef<Mesh>(null)
-  const texture = useLoader(TextureLoader, SUN_DATA.texture)
+  const texture = useLoader(TextureLoader, getTexturePath(SUN_DATA.texture))
 
   useFrame((_, delta) => {
     if (meshRef.current) {
